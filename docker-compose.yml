@@ -1,3 +1,6 @@
+networks:
+  shared-network:
+
 volumes:
   cloudflared:
     driver: local
@@ -10,6 +13,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
+    networks: ['shared-network']
     env_file:
       - .env
     command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}

@@ -1,6 +1,6 @@
 # Cloudflared Docker Setup
 
-This repository contains a Docker-based setup for running Cloudflare Tunnel (cloudflared) in a containerized environment.
+This repository contains a Docker-based setup for running Cloudflare Tunnel (cloudflared) in a containerized environment, with specific configuration for integration with Odoo self-hosted instances.
 
 ## Prerequisites
 
@@ -13,8 +13,8 @@ This repository contains a Docker-based setup for running Cloudflare Tunnel (clo
 
 The project uses the following configuration files:
 
-- `docker-compose.yml`: Defines the container setup and volume mapping
-- `.env`: Contains the Cloudflare Tunnel token (created from `.env.sample`)
+- `docker-compose.yml`: Defines the container setup, volume mapping, and network configuration
+- `.env`: Contains the Cloudflare Tunnel token and shared network configuration (created from `.env.sample`)
 - `.env.sample`: Template file for environment variables
 - `start-cloudflared.sh`: Script for running cloudflared directly (without Docker)
 - `start-cloudflared-container.sh`: Script for running cloudflared in a Docker container
@@ -67,19 +67,21 @@ docker-compose up -d
 
 ### Option 2: Using Docker Run Script
 
-You can also use the provided script to run cloudflared in a Docker container:
+You can also use the provided script to run cloudflared in a Docker container. The script uses the CLOUDFLARED_TOKEN environment variable:
 
 ```bash
 chmod +x start-cloudflared-container.sh
+export CLOUDFLARED_TOKEN=your-tunnel-token-here
 ./start-cloudflared-container.sh
 ```
 
 ### Option 3: Running Directly (Without Docker)
 
-To run cloudflared directly on your host machine:
+To run cloudflared directly on your host machine. The script uses the CLOUDFLARED_TOKEN environment variable:
 
 ```bash
 chmod +x start-cloudflared.sh
+export CLOUDFLARED_TOKEN=your-tunnel-token-here
 ./start-cloudflared.sh
 ```
 
@@ -98,6 +100,8 @@ Replace `hostname` with the hostname you want to connect to via SSH.
 
 - Uses official Cloudflare tunnel Docker image
 - Automatic container restart unless stopped manually
+- Shared Docker network with Odoo instances for direct service communication
+- Service discovery for Odoo instances via container names
 - Persistent volume mapping for configuration
 - No auto-update to ensure stability
 - SSH access via Cloudflare Tunnel
@@ -122,17 +126,16 @@ Replace `hostname` with the hostname you want to connect to via SSH.
 └── cloudflared.log              # Log file for cloudflared (generated at runtime)
 ```
 
-## Security Notes
+## Security Considerations
 
-⚠️ **IMPORTANT SECURITY WARNINGS:**
+- The tunnel token is stored in the `.env` file and should be kept secure
+- All scripts now use the CLOUDFLARED_TOKEN environment variable instead of hardcoded tokens
+- Avoid committing the `.env` file to version control (it's already in `.gitignore`)
+- When running scripts directly, export the CLOUDFLARED_TOKEN environment variable instead of hardcoding it
 
-1. **Keep your tunnel token secure** and never commit it to version control. The `.env` file is already included in `.gitignore` to prevent accidental commits.
+1. **Volume Permissions:** The `create_volumes.sh` script sets directory permissions to 777 for Docker compatibility. In production environments, consider using more restrictive permissions and proper user mapping.
 
-2. **WARNING:** The provided scripts (`start-cloudflared.sh` and `start-cloudflared-container.sh`) contain hardcoded tunnel tokens for demonstration purposes. **These should be replaced with your own tokens** or preferably use environment variables instead of hardcoded values.
-
-3. **Volume Permissions:** The `create_volumes.sh` script sets directory permissions to 777 for Docker compatibility. In production environments, consider using more restrictive permissions and proper user mapping.
-
-4. **Token Rotation:** Regularly rotate your Cloudflare tunnel tokens and update the `.env` file accordingly.
+2. **Token Rotation:** Regularly rotate your Cloudflare tunnel tokens and update the `.env` file accordingly.
 
 ## Maintenance
 
@@ -143,9 +146,62 @@ docker-compose pull
 docker-compose up -d
 ```
 
+## Shared Network Configuration
+
+This cloudflared setup is designed to work with the Odoo self-hosted kit by sharing a Docker network. This allows the cloudflared container to communicate directly with Odoo instances using their service names.
+
+### Network Setup
+
+The shared network is defined in the `docker-compose.yml` file:
+
+```yaml
+networks:
+  shared-network:
+    name: ${SHARED_DOCKER_NETWORK}
+    external: true
+```
+
+This configuration ensures that:
+
+1. The cloudflared container joins an existing Docker network created by the Odoo setup
+2. Service discovery works correctly (cloudflared can resolve Odoo container names)
+3. Requests can be properly forwarded from Cloudflare to your Odoo instances
+
+### Environment Variables
+
+The `.env` file should include:
+
+```
+CLOUDFLARED_TOKEN=your-tunnel-token-here
+SHARED_DOCKER_NETWORK=cloudflared_shared-network
+```
+
+> **Important:** The `SHARED_DOCKER_NETWORK` value must match the value used in the Odoo self-hosted kit environment.
+
 ## Troubleshooting
 
-If you encounter issues with the tunnel connection, check the logs:
+### 502 Bad Gateway Errors
+
+If you encounter 502 errors when accessing Odoo through the Cloudflare tunnel:
+
+1. Verify that both cloudflared and Odoo containers are on the same Docker network:
+   ```bash
+   docker network ls
+   docker network inspect ${SHARED_DOCKER_NETWORK}
+   ```
+
+2. Check that cloudflared is configured to point to the correct Odoo service names and ports
+
+3. Verify that the Odoo services are running and accessible
+
+4. Check the cloudflared logs for connection errors:
+   ```bash
+   docker logs cloudflared
+   ```
+
+### General Tunnel Issues
+
+If you encounter other issues with the tunnel connection, check the logs:
 
 ```bash
 # For Docker Compose setup
