@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cloudflared tunnel run --token eyJhIjoiMzA2NjQ2NDExOGZmMTA1MjJmNTZkZTVmYTViYzIxZTciLCJ0IjoiMjgzMDI5NmUtY2ZmYy00YjVlLThhNjgtMGQzZjllMzQ5NzAzIiwicyI6Ik1UbGpZelF3TlRndE5UTm1NeTAwTm1GaUxUaGpOamd0WVRNNFlXTmxPVEF6WlRjeSJ9 > cloudflared.log 2>&1 &
+cloudflared tunnel run --token ${CLOUDFLARED_TOKEN} > cloudflared.log 2>&1 &
