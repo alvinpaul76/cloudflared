@@ -5,7 +5,6 @@
 *.swp
 docker-compose.override.yml
 .env
-.env.*
 
 # Cloudflared specific
 cert.pem
