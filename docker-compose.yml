@@ -1,0 +1,17 @@
+volumes:
+  cloudflared:
+    driver: local
+    driver_opts:
+      type: none
+      device: /storage/cloudflare/cloudflared
+      o: bind
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    volumes:
+      - cloudflared:/home/nonroot/.cloudflared

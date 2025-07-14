@@ -1,0 +1,29 @@
+# Docker-related
+*.log
+*.pid
+*.bak
+*.swp
+docker-compose.override.yml
+.env
+.env.*
+
+# Cloudflared specific
+cert.pem
+config.yml
+*.json
+cloudflared.log
+
+# NodeJS or Python project related (optional, if present)
+node_modules/
+__pycache__/
+*.pyc
+
+# System files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# If using Docker volumes or output folders
+volumes/
+data/
