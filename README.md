@@ -1,238 +1,127 @@
-# Cloudflared Docker Setup
+# Cloudflare Tunnel Setup
 
-This repository contains a Docker-based setup for running Cloudflare Tunnel (cloudflared) in a containerized environment, with specific configuration for integration with Odoo self-hosted instances.
+Welcome! This project makes it easy to set up Cloudflare Tunnel - a secure way to access your services from anywhere without opening ports on your router or exposing your server to the internet.
 
-## Prerequisites
+## 🚀 Quick Start
 
-- Docker
-- Docker Compose
-- A Cloudflare account with Tunnel configured
-- Sudo privileges (required for volume creation script)
+New here? Start with our comprehensive user guide:
 
-## Configuration
+**[📖 Start Here: What is Cloudflare Tunnel?](docs/01-introduction.md)**
 
-The project uses the following configuration files:
+## 📚 Complete User Documentation
 
-- `docker-compose.yml`: Defines the container setup, volume mapping, and network configuration
-- `.env`: Contains the Cloudflare Tunnel token and shared network configuration (created from `.env.sample`)
-- `.env.sample`: Template file for environment variables
-- `start-cloudflared.sh`: Script for running cloudflared directly (without Docker)
-- `start-cloudflared-container.sh`: Script for running cloudflared in a Docker container
-- `cloudflared-docker-ssh`: Helper script for SSH access via the cloudflared container
-- `create_volumes.sh`: Script to automatically create required volume directories
-- `.gitignore`: Ensures sensitive files are not committed to version control
+We've created detailed, easy-to-follow guides to help you every step of the way. Each guide is written for beginners - no technical expertise required!
 
-## Quick Start
+### Getting Started
 
-For the fastest setup, use the automated volume creation script:
+1. **[What is Cloudflare Tunnel?](docs/01-introduction.md)** - Learn what this is and why you might need it
+2. **[What You Need](docs/02-what-you-need.md)** - A checklist of everything you need before starting
+3. **[Getting Started Guide](docs/03-getting-started.md)** - Step-by-step setup instructions
+
+### Using Your Tunnel
+
+4. **[Configuration Guide](docs/04-configuration.md)** - How to set up different services (websites, SSH, etc.)
+5. **[Common Tasks](docs/05-common-tasks.md)** - Day-to-day management and maintenance
+6. **[Troubleshooting](docs/06-troubleshooting.md)** - Solutions to common problems
+
+### Additional Help
+
+7. **[FAQ](docs/07-faq.md)** - Frequently asked questions and answers
+
+## ✨ What Can You Do With This?
+
+- **Access your services from anywhere** - No matter where you are, your services are reachable
+- **No router configuration needed** - Forget about port forwarding and complex networking
+- **Automatic HTTPS/SSL** - Your connections are always encrypted and secure
+- **Works with Odoo** - Specifically designed to work with self-hosted Odoo instances
+- **SSH access** - Securely access your server remotely
+- **Multiple services** - Host multiple websites and applications through one tunnel
+
+## 🎯 Who Is This For?
+
+This setup is perfect for:
+- Small business owners hosting their own Odoo instance
+- Developers who need remote access to their projects
+- Anyone who wants secure, easy remote access without technical complexity
+- People who want to avoid router configuration and port forwarding
+
+## 🔒 Why Use Cloudflare Tunnel?
+
+**Security First**
+- No open ports on your router or firewall
+- All traffic is encrypted
+- Your server stays hidden from the internet
+- Protection against direct attacks
+
+**Simple and Reliable**
+- Easy setup with clear instructions
+- Automatic restart if something goes wrong
+- Always-on connection
+- Minimal maintenance required
+
+**Free to Use**
+- No cost for personal use
+- Unlimited bandwidth
+- No need for static IP addresses
+
+## 🛠️ Quick Setup Overview
+
+If you're already familiar with the basics, here's the quick version:
 
 ```bash
-# Clone the repository (if not already done)
+# 1. Get the project
 git clone <repository-url>
 cd cloudflared
 
-# Set up environment variables
+# 2. Set up your configuration
 cp .env.sample .env
-# Edit .env file and add your Cloudflare tunnel token
+# Edit .env and add your Cloudflare tunnel token
 
-# Create required directories automatically
+# 3. Create required directories
 sudo chmod +x create_volumes.sh
 sudo ./create_volumes.sh
 
-# Start the service
+# 4. Start the tunnel
 docker-compose up -d
 ```
 
-## Detailed Setup Instructions
+**New to this?** Please follow the [Getting Started Guide](docs/03-getting-started.md) for detailed instructions with explanations.
 
-### Option 1: Using Docker Compose (Recommended)
+## 📖 Documentation Structure
 
-1. Create a Cloudflare Tunnel and get your tunnel token
-2. Copy the `.env.sample` file to `.env` and add your tunnel token:
-   ```bash
-   cp .env.sample .env
-   # Edit .env and replace 'your-tunnel-token-here' with your actual token
-   ```
+All documentation is organized in the `docs/` folder:
 
-3. Create the required volume directories:
-   ```bash
-   sudo chmod +x create_volumes.sh
-   sudo ./create_volumes.sh
-   ```
+- **docs/01-introduction.md** - Overview and benefits
+- **docs/02-what-you-need.md** - Prerequisites and requirements
+- **docs/03-getting-started.md** - Complete setup guide
+- **docs/04-configuration.md** - Configuring different services
+- **docs/05-common-tasks.md** - Daily usage and maintenance
+- **docs/06-troubleshooting.md** - Problem-solving guide
+- **docs/07-faq.md** - Common questions and answers
 
-4. Start the service using Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
+## 💡 Need Help?
 
-### Option 2: Using Docker Run Script
+- **Stuck on setup?** Check the [troubleshooting guide](docs/06-troubleshooting.md)
+- **Have a question?** See the [FAQ](docs/07-faq.md)
+- **Want to learn more?** Start with the [introduction](docs/01-introduction.md)
 
-You can also use the provided script to run cloudflared in a Docker container. The script uses the CLOUDFLARED_TOKEN environment variable:
+## 📝 Project Files
 
-```bash
-chmod +x start-cloudflared-container.sh
-export CLOUDFLARED_TOKEN=your-tunnel-token-here
-./start-cloudflared-container.sh
-```
+- `docker-compose.yml` - Docker configuration
+- `.env.sample` - Template for your settings
+- `create_volumes.sh` - Automated setup script
+- `start-cloudflared.sh` - Alternative startup method
+- `start-cloudflared-container.sh` - Docker container startup
+- `cloudflared-docker-ssh` - SSH access helper
 
-### Option 3: Running Directly (Without Docker)
+## 🔐 Security Note
 
-To run cloudflared directly on your host machine. The script uses the CLOUDFLARED_TOKEN environment variable:
+Your `.env` file contains sensitive information (your tunnel token). Never share it or commit it to version control. It's already included in `.gitignore` for your protection.
 
-```bash
-chmod +x start-cloudflared.sh
-export CLOUDFLARED_TOKEN=your-tunnel-token-here
-./start-cloudflared.sh
-```
-
-## SSH Access via Cloudflare Tunnel
-
-This setup includes a helper script for SSH access via Cloudflare Tunnel:
-
-```bash
-chmod +x cloudflared-docker-ssh
-./cloudflared-docker-ssh hostname
-```
-
-Replace `hostname` with the hostname you want to connect to via SSH.
-
-## Features
-
-- Uses official Cloudflare tunnel Docker image
-- Automatic container restart unless stopped manually
-- Shared Docker network with Odoo instances for direct service communication
-- Service discovery for Odoo instances via container names
-- Persistent volume mapping for configuration
-- No auto-update to ensure stability
-- SSH access via Cloudflare Tunnel
-- Automated volume directory creation script
-- Secure environment variable management
-- Git ignore configuration for sensitive files
-
-## Directory Structure
-
-```
-.
-├── docker-compose.yml           # Docker Compose configuration
-├── .env                         # Environment variables (created from .env.sample)
-├── .env.sample                  # Template for environment variables
-├── .gitignore                   # Git ignore file for sensitive data
-├── README.md                    # This documentation
-├── LICENSE                      # Project license
-├── start-cloudflared.sh         # Script to run cloudflared directly
-├── start-cloudflared-container.sh # Script to run cloudflared in Docker
-├── cloudflared-docker-ssh       # Helper script for SSH access
-├── create_volumes.sh            # Script to create required volume directories
-└── cloudflared.log              # Log file for cloudflared (generated at runtime)
-```
-
-## Security Considerations
-
-- The tunnel token is stored in the `.env` file and should be kept secure
-- All scripts now use the CLOUDFLARED_TOKEN environment variable instead of hardcoded tokens
-- Avoid committing the `.env` file to version control (it's already in `.gitignore`)
-- When running scripts directly, export the CLOUDFLARED_TOKEN environment variable instead of hardcoding it
-
-1. **Volume Permissions:** The `create_volumes.sh` script sets directory permissions to 777 for Docker compatibility. In production environments, consider using more restrictive permissions and proper user mapping.
-
-2. **Token Rotation:** Regularly rotate your Cloudflare tunnel tokens and update the `.env` file accordingly.
-
-## Maintenance
-
-The container is configured to restart automatically unless explicitly stopped. To update to a new version of cloudflared, you'll need to manually pull the latest image and restart the container:
-
-```bash
-docker-compose pull
-docker-compose up -d
-```
-
-## Shared Network Configuration
-
-This cloudflared setup is designed to work with the Odoo self-hosted kit by sharing a Docker network. This allows the cloudflared container to communicate directly with Odoo instances using their service names.
-
-### Network Setup
-
-The shared network is defined in the `docker-compose.yml` file:
-
-```yaml
-networks:
-  shared-network:
-    name: ${SHARED_DOCKER_NETWORK}
-    external: true
-```
-
-This configuration ensures that:
-
-1. The cloudflared container joins an existing Docker network created by the Odoo setup
-2. Service discovery works correctly (cloudflared can resolve Odoo container names)
-3. Requests can be properly forwarded from Cloudflare to your Odoo instances
-
-### Environment Variables
-
-The `.env` file should include:
-
-```
-CLOUDFLARED_TOKEN=your-tunnel-token-here
-SHARED_DOCKER_NETWORK=cloudflared_shared-network
-```
-
-> **Important:** The `SHARED_DOCKER_NETWORK` value must match the value used in the Odoo self-hosted kit environment.
-
-## Troubleshooting
-
-### 502 Bad Gateway Errors
-
-If you encounter 502 errors when accessing Odoo through the Cloudflare tunnel:
-
-1. Verify that both cloudflared and Odoo containers are on the same Docker network:
-   ```bash
-   docker network ls
-   docker network inspect ${SHARED_DOCKER_NETWORK}
-   ```
-
-2. Check that cloudflared is configured to point to the correct Odoo service names and ports
-
-3. Verify that the Odoo services are running and accessible
-
-4. Check the cloudflared logs for connection errors:
-   ```bash
-   docker logs cloudflared
-   ```
-
-### General Tunnel Issues
-
-If you encounter other issues with the tunnel connection, check the logs:
-
-```bash
-# For Docker Compose setup
-docker logs cloudflared
-
-# For direct execution
-cat cloudflared.log
-```
-
-### Common Issues
-
-1. **Permission denied when creating volumes:**
-   - Ensure you run `create_volumes.sh` with sudo privileges
-   - Check that the `/storage` directory is writable
-
-2. **Container fails to start:**
-   - Verify your tunnel token is correctly set in the `.env` file
-   - Check that Docker has sufficient resources allocated
-
-3. **SSH access not working:**
-   - Ensure the cloudflared container is running: `docker ps`
-   - Verify the hostname is correctly configured in your Cloudflare dashboard
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
+## 📄 License
 
 This project is licensed under the terms specified in the LICENSE file.
+
+---
+
+**Ready to get started?** Begin with [What is Cloudflare Tunnel?](docs/01-introduction.md)

@@ -6,8 +6,9 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /storage/cloudflare/cloudflared
+      device: ${DEFAULT_STORAGE_FOLDER}/cloudflared
       o: bind
+
 services:
   cloudflared:
     image: cloudflare/cloudflared:latest
